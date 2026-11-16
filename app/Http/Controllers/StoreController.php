@@ -161,7 +161,7 @@ class StoreController extends Controller
         $products = Product::visible()->select('slug', 'updated_at')->latest('updated_at')->take(5000)->get();
         $categories = Category::where('is_visible', true)->select('slug', 'updated_at')->get();
 
-        // Built as a string (not Blade) so the "<?xml ... ?>" prolog can't clash with PHP tag parsing on the server.
+        // Built as a plain string (not a Blade view) so the XML prolog can't clash with PHP tag parsing.
         $url = fn (string $loc, $lastmod = null, ?string $freq = null) => '<url><loc>'.e($loc).'</loc>'
             .($lastmod ? '<lastmod>'.$lastmod->toAtomString().'</lastmod>' : '')
             .($freq ? '<changefreq>'.$freq.'</changefreq>' : '').'</url>';
