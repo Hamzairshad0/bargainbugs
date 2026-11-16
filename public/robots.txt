@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin
+Disallow: /go/
+Disallow: /cron/
+
+Sitemap: https://bargainbugs.co.uk/sitemap.xml
