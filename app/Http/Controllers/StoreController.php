@@ -161,6 +161,23 @@ class StoreController extends Controller
         $products = Product::visible()->select('slug', 'updated_at')->latest('updated_at')->take(5000)->get();
         $categories = Category::where('is_visible', true)->select('slug', 'updated_at')->get();
 
-        return response()->view('store.sitemap', compact('products', 'categories'))->header('Content-Type', 'application/xml');
+        // Built as a string (not Blade) so the "<?xml ... ?>" prolog can't clash with PHP tag parsing on the server.
+        $url = fn (string $loc, $lastmod = null, ?string $freq = null) => '<url><loc>'.e($loc).'</loc>'
+            .($lastmod ? '<lastmod>'.$lastmod->toAtomString().'</lastmod>' : '')
+            .($freq ? '<changefreq>'.$freq.'</changefreq>' : '').'</url>';
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        foreach (['home' => 'daily', 'shop' => 'daily', 'deals' => 'daily', 'new' => 'daily', 'categories' => 'weekly', 'about' => 'monthly', 'contact' => 'monthly'] as $r => $freq) {
+            $xml .= $url(route($r), null, $freq);
+        }
+        foreach ($categories as $c) {
+            $xml .= $url(route('category', $c), $c->updated_at, 'daily');
+        }
+        foreach ($products as $p) {
+            $xml .= $url(route('product', $p), $p->updated_at);
+        }
+        $xml .= '</urlset>';
+
+        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
     }
 }
