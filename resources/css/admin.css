@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Admin panel styles (kept separate from the storefront design). */
+/* Admin panel — same "Minimal Luxe" look as the storefront (warm off-white, ink, plum + tangerine accents). */
 @source '../views/admin/**/*.blade.php';
 @source '../views/layouts/admin.blade.php';
 @source '../views/partials/icon.blade.php';
@@ -9,33 +9,43 @@
 @source '../views/partials/pagination.blade.php';
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
 
-    --color-bug-50: #fff1f1;
-    --color-bug-100: #ffdfe0;
-    --color-bug-300: #ff9a9e;
-    --color-bug-500: #ff8500;
-    --color-bug-600: #ea6c00;
-    --color-bug-700: #c25400;
+    /* "bug" = tangerine accent */
+    --color-bug-50: #fff4ea;
+    --color-bug-100: #ffe6cf;
+    --color-bug-300: #ffb878;
+    --color-bug-500: #ff7a00;
+    --color-bug-600: #e06a00;
+    --color-bug-700: #b45300;
 
-    --color-ink: #1b1029;
-    --color-ink-soft: #4a4060;
-    --color-cream: #f8f6fc;
-    --color-cream-dark: #eee6fa;
-    --color-sun: #ffc400;
-    --color-sun-dark: #e0a800;
-    --color-leaf: #3a8f2c;
-    --color-plum: #52288a;
+    --color-ink: #15121a;
+    --color-ink-soft: #4a4458;
+    --color-muted: #6f6a75;
+    --color-line: #e8e4dd;
+    --color-stone: #f1eee8;
+    --color-bg: #fbfaf7;
+    --color-cream: #f4f1ec;
+    --color-cream-dark: #e8e4dd;
+    /* "sun" = soft plum highlight (was yellow) */
+    --color-sun: #efe7fb;
+    --color-sun-dark: #dccdf3;
+    --color-leaf: #2f8a4c;
+    --color-plum: #4a1f78;
 }
 
 @layer base {
-    body { color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
-    h1, h2, h3, .font-display { letter-spacing: -0.02em; }
+    body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, .font-display { letter-spacing: -0.025em; }
+    em, .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+    ::selection { background: var(--color-plum); color: #fff; }
+    main .grid > * { min-width: 0; } /* stop long text / code blocks pushing cards off-screen on phones */
 }
 
 @utility dots-light {
-    background-image: radial-gradient(rgb(255 255 255 / .18) 1.6px, transparent 1.7px);
+    background-image: radial-gradient(rgb(21 18 26 / .06) 1.2px, transparent 1.3px);
     background-size: 22px 22px;
 }
 @utility scrollbar-none {
@@ -46,23 +56,24 @@
 @layer components {
     .btn, .btn-primary, .btn-sun, .btn-ghost, .btn-dark {
         display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-        border-radius: 9999px; padding: .75rem 1.5rem; font-size: .875rem; font-weight: 700;
-        transition: transform .15s, box-shadow .15s, background-color .15s, color .15s; user-select: none; white-space: nowrap;
+        border-radius: 9999px; padding: .8rem 1.5rem; font-size: .875rem; font-weight: 600;
+        border: 1px solid transparent;
+        transition: transform .2s, background-color .25s, color .25s, border-color .25s; user-select: none; white-space: nowrap;
     }
-    .btn-primary, .btn-sun { border: 2px solid var(--color-ink); box-shadow: 4px 4px 0 0 var(--color-ink); }
-    .btn-primary { background: var(--color-bug-500); color: #fff; }
-    .btn-sun { background: var(--color-sun); color: var(--color-ink); }
-    .btn-primary:hover, .btn-sun:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--color-ink); }
-    .btn-ghost { background: #fff; color: var(--color-ink); border: 2px solid var(--color-ink); }
-    .btn-ghost:hover { background: var(--color-ink); color: #fff; }
-    .btn-dark { background: var(--color-ink); color: #fff; }
-    .btn-dark:hover { background: var(--color-ink-soft); }
-    .btn-sm { padding: .5rem 1rem; font-size: .8rem; }
+    .btn-primary:active, .btn-sun:active, .btn-ghost:active, .btn-dark:active { transform: scale(.97); }
+    .btn-primary, .btn-dark { background: var(--color-ink); color: #fff; }
+    .btn-primary:hover, .btn-dark:hover { background: var(--color-plum); }
+    .btn-sun { background: var(--color-bug-500); color: #fff; }
+    .btn-sun:hover { background: var(--color-bug-600); }
+    .btn-ghost { background: #fff; color: var(--color-ink); border-color: var(--color-line); }
+    .btn-ghost:hover { border-color: var(--color-ink); }
+    .btn-sm { padding: .55rem 1.05rem; font-size: .8rem; }
     button:disabled { opacity: .45; cursor: not-allowed; }
 
-    .chip { display: inline-flex; align-items: center; gap: .25rem; border-radius: 9999px; border: 2px solid var(--color-ink); background: #fff; padding: .25rem .75rem; font-size: .75rem; font-weight: 700; }
-    .badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: .25rem .6rem; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
-    .card-pop { border-radius: 1.5rem; border: 2px solid var(--color-ink); background: #fff; box-shadow: 4px 4px 0 0 var(--color-ink); }
-    .input { width: 100%; border-radius: 1rem; border: 2px solid rgb(27 16 41 / .15); background: #fff; padding: .75rem 1rem; font-size: .875rem; outline: none; }
-    .input:focus { border-color: var(--color-ink); box-shadow: 0 0 0 4px rgb(255 196 0 / .45); }
+    .chip { display: inline-flex; align-items: center; gap: .25rem; border-radius: 9999px; border: 1px solid var(--color-line); background: #fff; padding: .3rem .8rem; font-size: .75rem; font-weight: 600; }
+    .badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: .25rem .6rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .card-pop { border-radius: 24px; border: 1px solid var(--color-line); background: #fff; box-shadow: 0 1px 2px rgb(21 18 26 / .03), 0 12px 32px -18px rgb(21 18 26 / .12); }
+    .input { width: 100%; border-radius: 14px; border: 1px solid var(--color-line); background: #fff; padding: .75rem 1rem; font-size: .875rem; outline: none; transition: border-color .2s, box-shadow .2s; }
+    .input:focus { border-color: var(--color-ink); box-shadow: 0 0 0 4px var(--color-stone); }
+    .eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--color-muted); }
 }

@@ -38,9 +38,9 @@
 
     <form action="{{ route('admin.products.bulk') }}" method="post">
         @csrf
-        <div class="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border-2 border-ink/10 bg-white p-3 text-sm">
+        <div class="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-white p-3 text-sm">
             <span class="font-bold">With selected:</span>
-            <select name="action" class="rounded-xl border-2 border-ink/15 px-3 py-2 font-semibold">
+            <select name="action" class="rounded-xl border border-ink/15 px-3 py-2 font-semibold">
                 <option value="feature">⭐ Feature on home page</option>
                 <option value="unfeature">Remove from featured</option>
                 <option value="hide">🙈 Hide from website</option>
@@ -48,16 +48,16 @@
                 <option value="category">📁 Move to category…</option>
                 <option value="delete">🗑️ Delete</option>
             </select>
-            <select name="category_id" class="rounded-xl border-2 border-ink/15 px-3 py-2 font-semibold">
+            <select name="category_id" class="rounded-xl border border-ink/15 px-3 py-2 font-semibold">
                 <option value="">(category for “Move to”)</option>
                 @foreach ($categories as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach
             </select>
             <button class="btn-dark btn-sm" data-confirm="Apply this action to the selected products?">Apply</button>
         </div>
 
-        <div class="overflow-x-auto rounded-3xl border-2 border-ink bg-white shadow-[4px_4px_0_0_var(--color-ink)]">
+        <div class="overflow-x-auto rounded-[24px] border border-line bg-white shadow-[0_12px_32px_-18px_rgb(21_18_26/.12)]">
             <table class="w-full min-w-[900px] text-sm">
-                <thead class="border-b-2 border-ink bg-cream text-left text-xs font-bold uppercase tracking-wider text-ink/60">
+                <thead class="border-b border-line bg-bg text-left text-[11px] font-semibold uppercase tracking-wider text-ink/60">
                     <tr>
                         <th class="w-10 p-4"><input type="checkbox" data-check-all=".row-check" class="h-4 w-4 accent-bug-500" aria-label="Select all"></th>
                         <th class="p-4">Product</th>

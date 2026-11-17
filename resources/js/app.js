@@ -109,15 +109,37 @@ $$('[data-catalog]').forEach((cat) => {
         requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
+    let busy = false;
     const load = async (url, append = false) => {
+        if (append && busy) return;
+        busy = true;
         grid.classList.toggle('loading', !append);
         const u = new URL(url, location.origin);
         u.searchParams.set('partial', '1');
         try {
             const d = await (await fetch(u, { headers: { Accept: 'application/json' } })).json();
             render(d, append);
-        } finally { grid.classList.remove('loading'); }
+        } finally { grid.classList.remove('loading'); busy = false; }
     };
+
+    // Infinite scroll: fetch the next 24 automatically as the "Load more" button nears the screen.
+    const moreBtn = $('[data-more]', cat);
+    if (moreBtn) {
+        const loadNext = () => {
+            if (busy || moreBtn.hidden || moreBtn.getAttribute('href') === '#') return;
+            $('[data-more-label]', moreBtn).textContent = 'Loading…';
+            load(moreBtn.href, true).then(() => {
+                // still near the screen (fast scroll / tall screen)? keep going
+                if (!moreBtn.hidden && moreBtn.getBoundingClientRect().top < innerHeight + 600) loadNext();
+            });
+        };
+        const near = () => !moreBtn.hidden && moreBtn.getBoundingClientRect().top < innerHeight + 600;
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && loadNext(), { rootMargin: '0px 0px 600px 0px' }).observe(moreBtn);
+        }
+        let tick = 0; // cheap scroll fallback (older browsers, throttled observers)
+        addEventListener('scroll', () => { if (!tick++) setTimeout(() => { tick = 0; if (near()) loadNext(); }, 200); }, { passive: true });
+    }
 
     cat.addEventListener('click', (e) => {
         const chip = e.target.closest('[data-chip]');
@@ -134,6 +156,7 @@ $$('[data-catalog]').forEach((cat) => {
             chip.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
         } else if (more) {
             e.preventDefault();
+            if (busy) return;
             more.querySelector('[data-more-label]').textContent = 'Loading…';
             load(more.href, true);
         }

@@ -11,7 +11,7 @@
     @php $isEbay = $product->source === 'ebay'; @endphp
 
     @if ($isEbay)
-        <div class="mb-6 rounded-2xl border-2 border-ink/15 bg-white p-4 text-sm">
+        <div class="mb-6 rounded-2xl border border-ink/15 bg-white p-4 text-sm">
             🔄 <b>This product is synced from eBay</b> (item #{{ $product->ebay_item_id }}, last synced {{ $product->ebay_synced_at?->diffForHumans() ?? 'never' }}).
             Price, stock and status always follow eBay. Tick <b>“Lock my edits”</b> below if you want to keep your own title, description, photos and category.
         </div>
@@ -35,7 +35,7 @@
             </div>
 
             <div class="card-pop grid gap-4 p-6">
-                <h2 class="font-display text-lg font-extrabold">Photos</h2>
+                <h2 class="font-display text-lg font-semibold">Photos</h2>
                 <label class="grid gap-2 text-sm font-bold">Image URLs <span class="font-normal text-ink/50">(one per line — first is the main photo)</span>
                     <textarea name="image_urls" rows="5" data-images-input="#img-preview" class="input font-mono !text-xs">{{ old('image_urls', implode("\n", $product->images ?? [])) }}</textarea>
                 </label>
@@ -49,7 +49,7 @@
 
         <div class="space-y-6">
             <div class="card-pop grid gap-4 p-6">
-                <h2 class="font-display text-lg font-extrabold">Pricing & stock</h2>
+                <h2 class="font-display text-lg font-semibold">Pricing & stock</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <label class="grid gap-2 text-sm font-bold">Price (£)
                         <input type="number" step="0.01" min="0" name="price" value="{{ old('price', $product->price) }}" required class="input">
@@ -75,7 +75,7 @@
             </div>
 
             <div class="card-pop grid gap-4 p-6">
-                <h2 class="font-display text-lg font-extrabold">Organise</h2>
+                <h2 class="font-display text-lg font-semibold">Organise</h2>
                 <label class="grid gap-2 text-sm font-bold">Category
                     <select name="category_id" class="input">
                         <option value="">— Uncategorised —</option>
@@ -103,7 +103,7 @@
             </div>
 
             @if ($product->exists)
-                <div class="rounded-2xl border-2 border-ink/10 bg-white p-4 text-xs text-ink/60">
+                <div class="rounded-2xl border border-ink/10 bg-white p-4 text-xs text-ink/60">
                     {{ number_format($product->views) }} views · {{ number_format($product->clicks) }} eBay clicks · {{ $product->watch_count }} watchers on eBay<br>
                     Added {{ $product->created_at->format('d M Y H:i') }}
                 </div>

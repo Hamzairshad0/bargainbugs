@@ -9,7 +9,7 @@
             <div class="card-pop p-6">
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <h2 class="font-display text-xl font-extrabold">1. Connection</h2>
+                        <h2 class="font-display text-xl font-semibold">1. Connection</h2>
                         <p class="mt-2 text-sm">
                             @if ($connected)
                                 <span class="font-bold text-leaf">● Connected</span>{{ $ebayUser ? ' as '.$ebayUser : '' }}
@@ -43,7 +43,7 @@ EBAY_RUNAME=your-RuName</pre>
                     </div>
                 @endunless
 
-                <div class="mt-5 rounded-2xl border-2 border-dashed border-ink/15 p-4 text-sm">
+                <div class="mt-5 rounded-2xl border border-dashed border-ink/15 p-4 text-sm">
                     <p class="font-bold">Your RuName “Auth accepted URL” must be:</p>
                     <div class="mt-2 flex items-center gap-2">
                         <code class="flex-1 overflow-x-auto rounded-xl bg-cream px-3 py-2 text-xs">{{ $callbackUrl }}</code>
@@ -54,7 +54,7 @@ EBAY_RUNAME=your-RuName</pre>
 
             {{-- Sync --}}
             <div class="card-pop p-6">
-                <h2 class="font-display text-xl font-extrabold">2. Sync products</h2>
+                <h2 class="font-display text-xl font-semibold">2. Sync products</h2>
                 <p class="mt-2 text-sm text-ink/60">
                     {{ number_format($ebayCount) }} products from eBay ·
                     Last full sync: <b>{{ $lastFull ? \Carbon\Carbon::parse($lastFull)->diffForHumans() : 'never' }}</b> ·
@@ -80,7 +80,7 @@ EBAY_RUNAME=your-RuName</pre>
 
             {{-- Automatic --}}
             <div class="card-pop p-6">
-                <h2 class="font-display text-xl font-extrabold">3. Automatic sync</h2>
+                <h2 class="font-display text-xl font-semibold">3. Automatic sync</h2>
                 <p class="mt-2 text-sm leading-6 text-ink/70">
                     Hit this URL every 10–15 minutes and the site stays in step with eBay. Each call adds new listings, updates price and stock, and hides anything that sold or ended. It runs a full re-check once a day.
                 </p>
@@ -97,10 +97,10 @@ EBAY_RUNAME=your-RuName</pre>
 
         {{-- Logs --}}
         <div class="card-pop self-start p-6">
-            <h2 class="font-display text-xl font-extrabold">Sync history</h2>
+            <h2 class="font-display text-xl font-semibold">Sync history</h2>
             <div class="mt-4 space-y-3">
                 @forelse ($logs as $log)
-                    <div class="rounded-2xl border-2 p-3 text-xs {{ $log->status === 'failed' ? 'border-bug-300 bg-bug-50' : ($log->status === 'running' ? 'border-sun bg-sun/10' : 'border-ink/10') }}">
+                    <div class="rounded-2xl border p-3 text-xs {{ $log->status === 'failed' ? 'border-bug-300 bg-bug-50' : ($log->status === 'running' ? 'border-sun bg-sun/10' : 'border-ink/10') }}">
                         <div class="flex justify-between font-bold">
                             <span>{{ ucfirst($log->type) }} · {{ $log->status }}</span>
                             <span class="text-ink/50">{{ $log->created_at->diffForHumans() }}</span>

@@ -7,9 +7,9 @@
 
 @section('content')
     <p class="mb-4 text-sm text-ink/60">People who joined the “Bug Club” newsletter. Export the CSV to import into Mailchimp, Klaviyo or similar.</p>
-    <div class="overflow-hidden rounded-3xl border-2 border-ink bg-white shadow-[4px_4px_0_0_var(--color-ink)]">
+    <div class="overflow-hidden rounded-[24px] border border-line bg-white shadow-[0_12px_32px_-18px_rgb(21_18_26/.12)]">
         <table class="w-full text-sm">
-            <thead class="border-b-2 border-ink bg-cream text-left text-xs font-bold uppercase tracking-wider text-ink/60"><tr><th class="p-4">Email</th><th class="p-4">Joined</th></tr></thead>
+            <thead class="border-b border-line bg-bg text-left text-[11px] font-semibold uppercase tracking-wider text-ink/60"><tr><th class="p-4">Email</th><th class="p-4">Joined</th></tr></thead>
             <tbody class="divide-y divide-ink/10">
                 @forelse ($subscribers as $s)
                     <tr><td class="p-4 font-semibold">{{ $s->email }}</td><td class="p-4 text-ink/60">{{ $s->created_at->format('d M Y') }}</td></tr>

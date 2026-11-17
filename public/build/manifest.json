@@ -6,7 +6,7 @@
     "isDynamicEntry": true
   },
   "resources/css/admin.css": {
-    "file": "assets/admin-B_bZ6HS-.css",
+    "file": "assets/admin-46qxc7HB.css",
     "name": "admin",
     "names": [
       "admin.css"
@@ -15,7 +15,7 @@
     "isEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-Cg-gLdxk.css",
+    "file": "assets/app-NtdaI-Kx.css",
     "name": "app",
     "names": [
       "app.css"
@@ -30,7 +30,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-D8xpAMhK.js",
+    "file": "assets/app-BjXcUKY6.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

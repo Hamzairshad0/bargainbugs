@@ -8,9 +8,9 @@
 @section('content')
     <p class="mb-4 text-sm text-ink/60">Categories are created automatically from your eBay listings (top-level eBay category). Rename them, add an emoji, reorder or hide them here — your changes are kept on future syncs.</p>
 
-    <div class="overflow-x-auto rounded-3xl border-2 border-ink bg-white shadow-[4px_4px_0_0_var(--color-ink)]">
+    <div class="overflow-x-auto rounded-[24px] border border-line bg-white shadow-[0_12px_32px_-18px_rgb(21_18_26/.12)]">
         <table class="w-full min-w-[700px] text-sm">
-            <thead class="border-b-2 border-ink bg-cream text-left text-xs font-bold uppercase tracking-wider text-ink/60">
+            <thead class="border-b border-line bg-bg text-left text-[11px] font-semibold uppercase tracking-wider text-ink/60">
                 <tr><th class="p-4">Category</th><th class="p-4">Maps from eBay</th><th class="p-4">Products</th><th class="p-4">Order</th><th class="p-4">Visible</th><th class="p-4"></th></tr>
             </thead>
             <tbody class="divide-y divide-ink/10">
