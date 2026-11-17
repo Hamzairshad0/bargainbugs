@@ -1,0 +1,68 @@
+@import 'tailwindcss';
+
+/* Admin panel styles (kept separate from the storefront design). */
+@source '../views/admin/**/*.blade.php';
+@source '../views/layouts/admin.blade.php';
+@source '../views/partials/icon.blade.php';
+@source '../js/admin.js';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../views/partials/pagination.blade.php';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-bug-50: #fff1f1;
+    --color-bug-100: #ffdfe0;
+    --color-bug-300: #ff9a9e;
+    --color-bug-500: #ff8500;
+    --color-bug-600: #ea6c00;
+    --color-bug-700: #c25400;
+
+    --color-ink: #1b1029;
+    --color-ink-soft: #4a4060;
+    --color-cream: #f8f6fc;
+    --color-cream-dark: #eee6fa;
+    --color-sun: #ffc400;
+    --color-sun-dark: #e0a800;
+    --color-leaf: #3a8f2c;
+    --color-plum: #52288a;
+}
+
+@layer base {
+    body { color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, .font-display { letter-spacing: -0.02em; }
+}
+
+@utility dots-light {
+    background-image: radial-gradient(rgb(255 255 255 / .18) 1.6px, transparent 1.7px);
+    background-size: 22px 22px;
+}
+@utility scrollbar-none {
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+}
+
+@layer components {
+    .btn, .btn-primary, .btn-sun, .btn-ghost, .btn-dark {
+        display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+        border-radius: 9999px; padding: .75rem 1.5rem; font-size: .875rem; font-weight: 700;
+        transition: transform .15s, box-shadow .15s, background-color .15s, color .15s; user-select: none; white-space: nowrap;
+    }
+    .btn-primary, .btn-sun { border: 2px solid var(--color-ink); box-shadow: 4px 4px 0 0 var(--color-ink); }
+    .btn-primary { background: var(--color-bug-500); color: #fff; }
+    .btn-sun { background: var(--color-sun); color: var(--color-ink); }
+    .btn-primary:hover, .btn-sun:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--color-ink); }
+    .btn-ghost { background: #fff; color: var(--color-ink); border: 2px solid var(--color-ink); }
+    .btn-ghost:hover { background: var(--color-ink); color: #fff; }
+    .btn-dark { background: var(--color-ink); color: #fff; }
+    .btn-dark:hover { background: var(--color-ink-soft); }
+    .btn-sm { padding: .5rem 1rem; font-size: .8rem; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    .chip { display: inline-flex; align-items: center; gap: .25rem; border-radius: 9999px; border: 2px solid var(--color-ink); background: #fff; padding: .25rem .75rem; font-size: .75rem; font-weight: 700; }
+    .badge { display: inline-flex; align-items: center; border-radius: 9999px; padding: .25rem .6rem; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .card-pop { border-radius: 1.5rem; border: 2px solid var(--color-ink); background: #fff; box-shadow: 4px 4px 0 0 var(--color-ink); }
+    .input { width: 100%; border-radius: 1rem; border: 2px solid rgb(27 16 41 / .15); background: #fff; padding: .75rem 1rem; font-size: .875rem; outline: none; }
+    .input:focus { border-color: var(--color-ink); box-shadow: 0 0 0 4px rgb(255 196 0 / .45); }
+}

@@ -1,113 +1,168 @@
-// Bargain Bugs — tiny vanilla JS, no framework needed.
+// Bargain Bugs storefront.
+import Alpine from 'alpinejs';
+import { initMotion, animateIn, ScrollTrigger, scrollToEl } from './motion';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const store = {
+    get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
+};
 
-// Generic toggles: <button data-toggle="#menu"> toggles .hidden on #menu
-document.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-toggle]');
-    if (!t) return;
-    const target = $(t.dataset.toggle);
-    if (!target) return;
-    target.classList.toggle('hidden');
-    t.setAttribute('aria-expanded', String(!target.classList.contains('hidden')));
-    const focus = target.querySelector('[data-autofocus]');
-    if (focus && !target.classList.contains('hidden')) focus.focus();
-});
-
-// Product gallery
-$$('[data-gallery]').forEach((g) => {
-    const main = $('[data-gallery-main]', g);
-    const thumbs = $$('[data-gallery-thumb]', g);
-    if (!main || !thumbs.length) return;
-    let idx = 0;
-    const show = (i) => {
-        idx = (i + thumbs.length) % thumbs.length;
-        main.src = thumbs[idx].dataset.src;
-        thumbs.forEach((t, n) => t.classList.toggle('!border-bug-500', n === idx));
-        const counter = $('[data-gallery-count]', g);
-        if (counter) counter.textContent = `${idx + 1} / ${thumbs.length}`;
-    };
-    thumbs.forEach((t, i) => t.addEventListener('click', () => show(i)));
-    $('[data-gallery-prev]', g)?.addEventListener('click', () => show(idx - 1));
-    $('[data-gallery-next]', g)?.addEventListener('click', () => show(idx + 1));
-
-    let x0 = null;
-    main.addEventListener('touchstart', (e) => (x0 = e.touches[0].clientX), { passive: true });
-    main.addEventListener('touchend', (e) => {
-        if (x0 === null) return;
-        const dx = e.changedTouches[0].clientX - x0;
-        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
-        x0 = null;
+// ------------------------------------------------------------------ Alpine state
+document.addEventListener('alpine:init', () => {
+    Alpine.store('toast', {
+        items: [],
+        show(text, icon = '✓') {
+            const id = Date.now() + Math.random();
+            this.items.push({ id, text, icon });
+            setTimeout(() => (this.items = this.items.filter((t) => t.id !== id)), 2400);
+        },
     });
+
+    Alpine.store('wish', {
+        ids: store.get('bb_wish', []),
+        has(id) { return this.ids.includes(id); },
+        toggle(id) {
+            const on = !this.has(id);
+            this.ids = on ? [id, ...this.ids].slice(0, 80) : this.ids.filter((i) => i !== id);
+            store.set('bb_wish', this.ids);
+            Alpine.store('toast').show(on ? 'Saved to your wishlist' : 'Removed from wishlist', on ? '♥' : '♡');
+        },
+    });
+
+    Alpine.store('ui', {
+        panel: null, // menu | wish | search | filters
+        open(p) {
+            this.panel = p;
+            document.body.classList.add('lock');
+            window.lenis?.stop();
+            if (p !== 'search') document.documentElement.style.overflow = 'hidden';
+        },
+        close() {
+            this.panel = null;
+            document.body.classList.remove('lock');
+            window.lenis?.start();
+            document.documentElement.style.overflow = '';
+        },
+    });
+
+    Alpine.data('wishDrawer', () => ({
+        html: '', loading: false,
+        async load() {
+            const ids = Alpine.store('wish').ids;
+            if (!ids.length) { this.html = ''; return; }
+            this.loading = true;
+            try { this.html = await (await fetch(`/api/cards?layout=list&ids=${ids.join(',')}`)).text(); } finally { this.loading = false; }
+        },
+    }));
+
+    Alpine.data('liveSearch', () => ({
+        q: '', items: [], total: 0, url: '/shop', loading: false, active: -1, t: null,
+        input() {
+            clearTimeout(this.t); this.active = -1;
+            if (this.q.trim().length < 2) { this.items = []; this.total = 0; return; }
+            this.t = setTimeout(() => this.fetch(), 200);
+        },
+        async fetch() {
+            this.loading = true;
+            try {
+                const d = await (await fetch(`/api/suggest?q=${encodeURIComponent(this.q.trim())}`)).json();
+                this.items = d.items; this.total = d.total; this.url = d.url;
+            } finally { this.loading = false; }
+        },
+        move(n) { if (this.items.length) this.active = (this.active + n + this.items.length) % this.items.length; },
+        submit(e) { if (this.active >= 0) { e.preventDefault(); location.href = this.items[this.active].url; } },
+    }));
 });
 
-// Share: native share sheet on phones, copy link elsewhere
-$$('[data-share]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-        const data = { title: btn.dataset.title || document.title, url: btn.dataset.url || location.href };
-        if (navigator.share) {
-            try { await navigator.share(data); } catch (_) { /* cancelled */ }
-            return;
+window.Alpine = Alpine;
+Alpine.start();
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && Alpine.store('ui').panel) Alpine.store('ui').close(); });
+
+// ------------------------------------------------------------------ Motion + sliders
+initMotion();
+if ($('.swiper')) import('./sliders').then((m) => m.initSliders());
+
+// ------------------------------------------------------------------ Product catalogue (chips, sort, load more)
+$$('[data-catalog]').forEach((cat) => {
+    const grid = $('[data-grid]', cat);
+    const pushUrl = cat.dataset.catalog === 'push';
+    let base = cat.dataset.base || location.pathname + location.search;
+
+    const render = (d, append) => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = d.html;
+        const items = [...tmp.children];
+        if (!append) grid.innerHTML = '';
+        items.forEach((i) => grid.appendChild(i));
+        animateIn(items);
+        $$('[data-shown]', cat).forEach((e) => (e.textContent = d.shown));
+        $$('[data-total]', cat).forEach((e) => (e.textContent = d.total));
+        const bar = $('[data-bar]', cat); if (bar) bar.style.width = (d.total ? (d.shown / d.total) * 100 : 0) + '%';
+        const more = $('[data-more]', cat);
+        if (more) {
+            more.hidden = !d.next;
+            if (d.next) { more.href = d.next; $('[data-more-label]', more).textContent = `Load ${d.nextCount} more`; }
         }
-        copy(data.url, btn);
-    });
-});
-$$('[data-copy]').forEach((btn) => btn.addEventListener('click', () => copy(btn.dataset.copy, btn)));
-
-function copy(text, btn) {
-    navigator.clipboard?.writeText(text).then(() => {
-        const label = $('[data-label]', btn) || btn;
-        const old = label.textContent;
-        label.textContent = 'Link copied!';
-        setTimeout(() => (label.textContent = old), 1600);
-    });
-}
-
-// Reveal on scroll (content stays visible if JS fails; safety net reveals everything after 2.5s)
-document.documentElement.classList.add('js');
-setTimeout(() => $$('.reveal').forEach((el) => el.classList.add('is-in')), 2500);
-const io = 'IntersectionObserver' in window
-    ? new IntersectionObserver((entries) => entries.forEach((en) => {
-        if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-    }), { rootMargin: '0px 0px -40px 0px' })
-    : null;
-$$('.reveal').forEach((el) => (io ? io.observe(el) : el.classList.add('is-in')));
-
-// Auto-submit filters
-$$('[data-autosubmit]').forEach((el) => el.addEventListener('change', () => el.form?.submit()));
-
-// Header shadow on scroll
-const header = $('[data-header]');
-if (header) {
-    const onScroll = () => header.classList.toggle('shadow-soft', window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-}
-
-// Admin: select-all checkboxes
-$$('[data-check-all]').forEach((all) => all.addEventListener('change', () => {
-    $$(all.dataset.checkAll).forEach((c) => (c.checked = all.checked));
-}));
-
-// Confirm dialogs: <form data-confirm="Sure?"> or <button data-confirm="...">
-document.addEventListener('submit', (e) => {
-    const msg = e.submitter?.dataset.confirm || e.target.dataset.confirm;
-    if (msg && !confirm(msg)) e.preventDefault();
-});
-
-// Admin: image URL list preview
-$$('[data-images-input]').forEach((ta) => {
-    const preview = $(ta.dataset.imagesInput);
-    const render = () => {
-        preview.innerHTML = '';
-        ta.value.split(/\n+/).map((s) => s.trim()).filter(Boolean).forEach((src) => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.className = 'h-20 w-20 rounded-xl object-cover border border-black/10 bg-white';
-            preview.appendChild(img);
-        });
+        requestAnimationFrame(() => ScrollTrigger.refresh());
     };
-    ta.addEventListener('input', render);
-    render();
+
+    const load = async (url, append = false) => {
+        grid.classList.toggle('loading', !append);
+        const u = new URL(url, location.origin);
+        u.searchParams.set('partial', '1');
+        try {
+            const d = await (await fetch(u, { headers: { Accept: 'application/json' } })).json();
+            render(d, append);
+        } finally { grid.classList.remove('loading'); }
+    };
+
+    cat.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-chip]');
+        const more = e.target.closest('[data-more]');
+        if (chip) {
+            e.preventDefault();
+            $$('[data-chip]', cat).forEach((c) => c.classList.toggle('on', c === chip));
+            const sort = $('[data-sort]', cat)?.value;
+            const u = new URL(chip.href, location.origin);
+            if (sort && sort !== 'featured') u.searchParams.set('sort', sort);
+            base = u.pathname + u.search;
+            if (pushUrl) history.replaceState(null, '', base);
+            load(base);
+            chip.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+        } else if (more) {
+            e.preventDefault();
+            more.querySelector('[data-more-label]').textContent = 'Loading…';
+            load(more.href, true);
+        }
+    });
+
+    $('[data-sort]', cat)?.addEventListener('change', (e) => {
+        const u = new URL(base, location.origin);
+        u.searchParams.delete('page');
+        e.target.value === 'featured' ? u.searchParams.delete('sort') : u.searchParams.set('sort', e.target.value);
+        base = u.pathname + u.search;
+        if (pushUrl) history.replaceState(null, '', base);
+        load(base);
+        const top = cat.getBoundingClientRect().top;
+        if (top < 0) scrollToEl(cat);
+    });
 });
+
+// ------------------------------------------------------------------ Share / copy
+document.addEventListener('click', async (e) => {
+    const share = e.target.closest('[data-share]');
+    const copy = e.target.closest('[data-copy]');
+    const url = share?.dataset.url || copy?.dataset.copy;
+    if (share && navigator.share) {
+        try { await navigator.share({ title: share.dataset.title, url }); } catch { /* cancelled */ }
+    } else if (url) {
+        navigator.clipboard?.writeText(url).then(() => Alpine.store('toast').show('Link copied', '🔗'));
+    }
+});
+
+// Recently viewed (product page)
+const rid = $('[data-recent-id]')?.dataset.recentId;
+if (rid) store.set('bb_recent', [Number(rid), ...store.get('bb_recent', []).filter((i) => i !== Number(rid))].slice(0, 12));

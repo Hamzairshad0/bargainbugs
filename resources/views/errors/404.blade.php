@@ -4,14 +4,13 @@
 @section('hide_newsletter', '1')
 
 @section('content')
-    <section class="container-x py-24 text-center">
-        <img src="{{ asset('images/logo-mark.svg') }}" alt="" class="mx-auto h-28 w-28 animate-wiggle">
-        <p class="mt-6 font-display text-8xl font-extrabold text-bug-500">404</p>
-        <h1 class="mt-2 font-display text-3xl font-extrabold">This bug crawled off somewhere…</h1>
-        <p class="mx-auto mt-3 max-w-md text-ink/60">The page or item you’re looking for isn’t here any more — it may have sold out. Plenty more bargains are waiting though!</p>
-        <div class="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="{{ route('shop') }}" class="btn-primary">Browse bargains</a>
-            <a href="{{ route('home') }}" class="btn-ghost">Back home</a>
+    <section class="page-head" style="padding:80px 0 120px;text-align:center">
+        <div class="wrap">
+            <img src="{{ asset('images/logo.png') }}" alt="" width="120" height="120" style="margin:0 auto">
+            <p class="serif" style="margin-top:20px;font-size:clamp(90px,16vw,180px);line-height:.8;color:var(--color-tang)">404</p>
+            <h1 style="font-size:clamp(32px,4vw,52px)">This bug crawled <em>off</em> somewhere…</h1>
+            <p class="sub" style="margin-inline:auto">The page or item you’re after isn’t here any more — it may have sold out. Plenty more bargains are waiting though.</p>
+            <div class="cta" style="justify-content:center"><a class="btn btn-dark" href="{{ route('shop') }}">Browse bargains <span class="arr">→</span></a><a class="ulink" href="{{ route('home') }}">Back home</a></div>
         </div>
     </section>
 @endsection

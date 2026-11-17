@@ -22,6 +22,10 @@ Route::controller(StoreController::class)->group(function () {
     Route::post('/contact', 'sendContact')->middleware('throttle:5,1')->name('contact.send');
     Route::post('/subscribe', 'subscribe')->middleware('throttle:5,1')->name('subscribe');
     Route::get('/sitemap.xml', 'sitemap')->name('sitemap');
+
+    // Small JSON / HTML endpoints used by the storefront scripts
+    Route::get('/api/suggest', 'suggest')->middleware('throttle:60,1')->name('api.suggest');
+    Route::get('/api/cards', 'cards')->middleware('throttle:60,1')->name('api.cards');
 });
 
 Route::get('/cron/ebay-sync', [CronController::class, 'ebaySync'])->name('cron.ebay');

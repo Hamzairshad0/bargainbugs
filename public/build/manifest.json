@@ -1,6 +1,21 @@
 {
+  "node_modules/lenis/dist/lenis.mjs": {
+    "file": "assets/lenis-D8KRuS-9.js",
+    "name": "lenis",
+    "src": "node_modules/lenis/dist/lenis.mjs",
+    "isDynamicEntry": true
+  },
+  "resources/css/admin.css": {
+    "file": "assets/admin-B_bZ6HS-.css",
+    "name": "admin",
+    "names": [
+      "admin.css"
+    ],
+    "src": "resources/css/admin.css",
+    "isEntry": true
+  },
   "resources/css/app.css": {
-    "file": "assets/app-7dBB4j_u.css",
+    "file": "assets/app-CLcfwkgW.css",
     "name": "app",
     "names": [
       "app.css"
@@ -8,10 +23,26 @@
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/js/admin.js": {
+    "file": "assets/admin-D2UP75zN.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-Gzj-mPIA.js",
+    "file": "assets/app-D8xpAMhK.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/lenis/dist/lenis.mjs",
+      "resources/js/sliders.js"
+    ]
+  },
+  "resources/js/sliders.js": {
+    "file": "assets/sliders-1rGOsHwy.js",
+    "name": "sliders",
+    "src": "resources/js/sliders.js",
+    "isDynamicEntry": true
   }
 }

@@ -40,6 +40,9 @@ class Setting extends Model
         'trust_2' => 'Fast UK dispatch',
         'trust_3' => 'eBay Money Back Guarantee',
         'trust_4' => 'New deals every week',
+        'ebay_feedback_score' => '',
+        'ebay_positive_percent' => '',
+        'testimonials' => '',
         'meta_description' => 'Bargain Bugs — big bargains, tiny prices. Shop our latest deals on homeware, gadgets, toys and more with secure checkout through eBay.',
     ];
 
@@ -58,14 +61,24 @@ class Setting extends Model
     {
         static::updateOrCreate(['key' => $key], ['value' => $value]);
         Cache::forget('settings.all');
+        if (static::$memo !== null) {
+            static::$memo[$key] = $value;
+        }
     }
+
+    /** Loaded once per request — views call setting() dozens of times, so never hit the cache/DB per call. */
+    private static ?array $memo = null;
 
     public static function allCached(): array
     {
+        if (static::$memo !== null) {
+            return static::$memo;
+        }
+
         try {
-            return Cache::remember('settings.all', 300, fn () => static::pluck('value', 'key')->all());
+            return static::$memo = Cache::remember('settings.all', 300, fn () => static::pluck('value', 'key')->all());
         } catch (Throwable) {
-            return [];
+            return static::$memo = [];
         }
     }
 }

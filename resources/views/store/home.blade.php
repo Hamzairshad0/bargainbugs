@@ -1,148 +1,89 @@
 @extends('layouts.store')
 
+@php $first = $hero->first(); @endphp
+@if ($first)
+    @push('preload')<link rel="preload" as="image" href="{{ \App\Models\Product::sized($first->images[0] ?? null, 960) }}" fetchpriority="high">@endpush
+@endif
+
 @section('content')
-    {{-- ============================== HERO ============================== --}}
-    <section class="relative overflow-hidden border-b-2 border-ink">
-        <div class="dots pointer-events-none absolute inset-0 opacity-[0.06]"></div>
-        <div class="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-sun/40 blur-3xl"></div>
-        <div class="pointer-events-none absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-bug-300/40 blur-3xl"></div>
-
-        <div class="container-x relative grid items-center gap-12 py-14 lg:grid-cols-[1.1fr_1fr] lg:py-24">
+    {{-- ============================================================ HERO --}}
+    <section class="hero">
+        <div class="hero-word" data-speed="-0.4" aria-hidden="true">Bargain</div>
+        <div class="wrap hero-grid">
             <div>
-                <span class="chip bg-white">
-                    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-leaf opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-leaf"></span></span>
-                    {{ number_format($liveCount) }} bargains live right now
-                </span>
-
-                @php
-                    $heroTitle = setting('hero_title');
-                    $words = explode(' ', $heroTitle);
-                    $last = array_pop($words);
-                @endphp
-                <h1 class="mt-6 font-display text-[44px] font-extrabold leading-[0.98] sm:text-6xl lg:text-7xl">
-                    {{ implode(' ', $words) }} <span class="highlight">{{ $last }}</span>
-                </h1>
-                <p class="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">{{ setting('hero_subtitle') }}</p>
-
-                <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('shop') }}" class="btn-primary !px-8 !py-4 !text-base">{{ setting('hero_cta') }} @include('partials.icon', ['name' => 'arrow', 'class' => 'h-5 w-5'])</a>
-                    <a href="{{ route('deals') }}" class="btn-ghost !px-8 !py-4 !text-base">See hot deals 🔥</a>
+                <p class="kicker" data-reveal>UK online e-store — secure checkout via eBay</p>
+                <h1 data-split data-now>Big bargains, <em data-keep>beautifully</em> small prices.</h1>
+                <p class="lede" data-reveal>{{ setting('hero_subtitle') }}</p>
+                <div class="cta" data-reveal>
+                    <a class="btn btn-dark" href="#edit" data-magnetic>{{ setting('hero_cta') }} <span class="arr">→</span></a>
+                    <a class="ulink" href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener">Visit our eBay store</a>
                 </div>
-
-                <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold text-ink/70">
-                    <span class="inline-flex items-center gap-2">@include('partials.icon', ['name' => 'shield', 'class' => 'h-5 w-5 text-leaf']) Buyer protection</span>
-                    <span class="inline-flex items-center gap-2">@include('partials.icon', ['name' => 'truck', 'class' => 'h-5 w-5 text-leaf']) Fast UK dispatch</span>
-                    <span class="inline-flex items-center gap-2">@include('partials.icon', ['name' => 'lock', 'class' => 'h-5 w-5 text-leaf']) Secure checkout</span>
-                </div>
+                @if ($stats->isNotEmpty())
+                    <div class="meta" data-reveal>
+                        @foreach ($stats as $s)
+                            <div><b><span data-count="{{ $s['value'] }}" data-dec="{{ $s['dec'] ?? 0 }}">{{ number_format($s['value'], $s['dec'] ?? 0) }}</span>{{ $s['suffix'] }}</b><span>{{ $s['label'] }}</span></div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
-            {{-- Floating product collage --}}
-            <div class="relative mx-auto h-[420px] w-full max-w-[520px] sm:h-[500px]">
-                <div class="absolute inset-6 rounded-[3rem] border-2 border-ink bg-bug-500 shadow-[10px_10px_0_0_var(--color-ink)]">
-                    <div class="dots-light absolute inset-0 rounded-[3rem]"></div>
-                    <img src="{{ asset('images/logo-mark.svg') }}" alt="" class="absolute -bottom-6 -left-6 h-24 w-24 animate-wiggle drop-shadow-lg">
-                </div>
-                @php
-                    $pos = [
-                        ['left-0 top-4 w-[56%]', '-6deg', '0s'],
-                        ['right-0 top-20 w-[50%]', '5deg', '1.2s'],
-                        ['left-[18%] bottom-0 w-[48%]', '-2deg', '2.4s'],
-                    ];
-                @endphp
-                @forelse ($heroProducts as $i => $p)
-                    <a href="{{ route('product', $p) }}" class="absolute {{ $pos[$i][0] }} animate-float block rounded-3xl border-2 border-ink bg-white p-2 shadow-[6px_6px_0_0_var(--color-ink)] transition hover:z-20 hover:scale-[1.03]"
-                       style="--r: {{ $pos[$i][1] }}; animation-delay: {{ $pos[$i][2] }}">
-                        <img src="{{ $p->image }}" alt="{{ $p->title }}" class="aspect-square w-full rounded-2xl object-cover" onerror="this.src='{{ asset('images/placeholder.svg') }}'">
-                        <div class="flex items-center justify-between gap-2 px-1.5 pb-1 pt-2">
-                            <span class="truncate text-xs font-semibold">{{ $p->title }}</span>
-                            <span class="shrink-0 rounded-full bg-sun px-2.5 py-0.5 font-display text-sm font-extrabold">{{ $p->money() }}</span>
-                        </div>
-                    </a>
-                @empty
-                    <div class="absolute inset-0 grid place-items-center">
-                        <div class="rounded-3xl border-2 border-ink bg-white p-8 text-center shadow-[6px_6px_0_0_var(--color-ink)]">
-                            <p class="font-display text-2xl font-extrabold">New stock landing soon 🐞</p>
+            <div class="stage">
+                <div class="ring r2"></div><div class="ring"></div><div class="disc"></div>
+                @if ($hero->isNotEmpty())
+                    <div class="swiper hero-swiper" data-hero-swiper>
+                        <div class="swiper-wrapper">
+                            @foreach ($hero as $i => $p)
+                                <div class="swiper-slide" data-cat="{{ $p->category?->name ?? 'Bargain' }}" data-price="{{ $p->money() }}" data-was="{{ $p->on_sale ? $p->money($p->original_price) : '' }}" data-off="{{ $p->on_sale ? '-'.$p->discount_percent.'%' : '' }}">
+                                    <a href="{{ route('product', $p) }}" style="display:contents" aria-label="{{ $p->title }}">
+                                        <img class="pimg" src="{{ \App\Models\Product::sized($p->images[0] ?? null, 960) ?? $p->thumb }}" alt="{{ $p->title }}" width="600" height="600" @if ($i === 0) fetchpriority="high" @else loading="lazy" @endif>
+                                    </a>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
-                @endforelse
+                    <div class="tag t1"><span data-tag-cat>{{ $first->category?->name }}</span><b data-tag-price>{{ $first->money() }}</b><s data-tag-was>{{ $first->on_sale ? $first->money($first->original_price) : '' }}</s> <span class="off" data-tag-off @if (! $first->on_sale) hidden @endif>{{ $first->on_sale ? '-'.$first->discount_percent.'%' : '' }}</span></div>
+                    <div class="tag t2">🔒 Buyer protection <span style="color:var(--color-muted)">on every order</span></div>
+                    @if ($hero->count() > 1)
+                        <div class="hnav">
+                            <button class="round" data-hero-prev aria-label="Previous">←</button>
+                            <span data-hero-count>01</span><span class="bar"><i data-hero-bar></i></span><span>{{ str_pad($hero->count(), 2, '0', STR_PAD_LEFT) }}</span>
+                            <button class="round" data-hero-next aria-label="Next">→</button>
+                        </div>
+                    @endif
+                @else
+                    <div class="hero-brand"><img src="{{ asset('images/logo.png') }}" alt="{{ setting('site_name') }}"></div>
+                    <div class="tag t2">✨ New stock <span style="color:var(--color-muted)">every week</span></div>
+                @endif
             </div>
         </div>
     </section>
 
-    {{-- ============================ TRUST STRIP ============================ --}}
-    <section class="border-b-2 border-ink bg-white">
-        <div class="container-x grid grid-cols-2 divide-ink/10 lg:grid-cols-4 lg:divide-x">
-            @foreach ([['shield', 'trust_1'], ['truck', 'trust_2'], ['heart', 'trust_3'], ['spark', 'trust_4']] as [$icon, $key])
-                <div class="flex items-center gap-3 px-2 py-5 lg:justify-center">
-                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-ink bg-cream">@include('partials.icon', ['name' => $icon, 'class' => 'h-5 w-5'])</span>
-                    <span class="text-sm font-bold leading-tight">{{ setting($key) }}</span>
-                </div>
-            @endforeach
-        </div>
-    </section>
+    <div class="strip" aria-hidden="true"><div class="marquee">
+        @for ($i = 0; $i < 2; $i++)
+            <span>Secure checkout</span><span>Fast UK dispatch</span><span>New stock every week</span><span>Money back guarantee</span><span>Hand-picked bargains</span>
+        @endfor
+    </div></div>
 
-    {{-- ============================ CATEGORIES ============================ --}}
+    {{-- ====================================================== CATEGORIES --}}
     @if ($navCategories->isNotEmpty())
-        <section class="container-x py-16 lg:py-20">
-            <div class="reveal flex items-end justify-between gap-4">
-                <div>
-                    <p class="text-sm font-extrabold uppercase tracking-widest text-bug-500">Browse</p>
-                    <h2 class="mt-1 font-display text-3xl font-extrabold sm:text-4xl">Shop by category</h2>
+        <section class="pad" data-carousel-wrap>
+            <div class="wrap">
+                <div class="sh">
+                    <div><small>01 — Categories</small><h2 data-split>Find your next <em data-keep>favourite</em> thing</h2></div>
+                    <div class="arrows"><button class="round" data-prev aria-label="Previous">←</button><button class="round" data-next aria-label="Next">→</button></div>
                 </div>
-                <a href="{{ route('categories') }}" class="hidden font-bold underline decoration-sun decoration-4 underline-offset-4 hover:text-bug-600 sm:inline">All categories →</a>
-            </div>
-            <div class="mt-8 flex gap-4 overflow-x-auto pb-4 scrollbar-none sm:grid sm:grid-cols-3 sm:overflow-visible lg:grid-cols-6">
-                @php $tileColors = ['bg-sun', 'bg-bug-100', 'bg-white', 'bg-[#d9f2e8]', 'bg-[#e3e8ff]', 'bg-cream-dark']; @endphp
-                @foreach ($navCategories->take(6) as $i => $cat)
-                    <a href="{{ route('category', $cat) }}" class="reveal group flex w-40 shrink-0 flex-col items-center gap-3 rounded-3xl border-2 border-ink {{ $tileColors[$i % 6] }} p-5 text-center shadow-[4px_4px_0_0_var(--color-ink)] transition hover:-translate-y-1 hover:shadow-[6px_7px_0_0_var(--color-ink)] sm:w-auto">
-                        @if ($cat->image_url)
-                            <img src="{{ $cat->image_url }}" alt="" class="h-16 w-16 rounded-2xl object-cover">
-                        @else
-                            <span class="text-5xl transition-transform group-hover:scale-110 group-hover:rotate-6">{{ $cat->icon ?: '🛍️' }}</span>
-                        @endif
-                        <span class="text-sm font-extrabold leading-tight">{{ $cat->name }}</span>
-                        <span class="text-xs font-semibold text-ink/50">{{ $cat->products_count }} items</span>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- ============================= FEATURED ============================= --}}
-    @if ($featured->isNotEmpty())
-        <section class="border-y-2 border-ink bg-white py-16 lg:py-20">
-            <div class="container-x">
-                <div class="reveal flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        <p class="text-sm font-extrabold uppercase tracking-widest text-bug-500">Hand-picked</p>
-                        <h2 class="mt-1 font-display text-3xl font-extrabold sm:text-4xl">Featured bargains</h2>
-                    </div>
-                    <a href="{{ route('shop') }}" class="btn-ghost btn-sm">View all @include('partials.icon', ['name' => 'arrow', 'class' => 'h-4 w-4'])</a>
-                </div>
-                <div class="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-                    @foreach ($featured as $product)
-                        <div class="reveal"><x-product-card :product="$product" /></div>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
-    {{-- ============================ DEALS BANNER ============================ --}}
-    @if ($deals->isNotEmpty())
-        <section class="container-x py-16 lg:py-20">
-            <div class="relative overflow-hidden rounded-[2rem] border-2 border-ink bg-ink p-6 text-white shadow-[8px_8px_0_0_var(--color-bug-500)] sm:p-10">
-                <div class="dots-light pointer-events-none absolute inset-0"></div>
-                <div class="relative grid gap-8 lg:grid-cols-[1fr_2fr] lg:items-center">
-                    <div class="reveal">
-                        <span class="badge bg-bug-500 text-white">Limited time</span>
-                        <h2 class="mt-4 font-display text-4xl font-extrabold leading-tight sm:text-5xl">Hot deals <span class="text-sun">this week</span> 🔥</h2>
-                        <p class="mt-4 text-white/70">Our biggest price drops, all in one place. When they’re gone, they’re gone.</p>
-                        <a href="{{ route('deals') }}" class="btn-sun mt-6">Grab a deal @include('partials.icon', ['name' => 'arrow', 'class' => 'h-4 w-4'])</a>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 text-ink lg:grid-cols-4">
-                        @foreach ($deals as $product)
-                            <div class="reveal"><x-product-card :product="$product" compact /></div>
+                <div class="swiper cat-swiper" data-carousel>
+                    <div class="swiper-wrapper">
+                        @foreach ($navCategories as $c)
+                            <div class="swiper-slide" data-reveal>
+                                <a class="cat" href="{{ route('category', $c) }}">
+                                    <div class="im">
+                                        @if ($c->cover)<img src="{{ $c->cover }}" alt="" loading="lazy" width="300" height="400">@else<span class="emoji">{{ $c->icon ?: '🛍️' }}</span>@endif
+                                        <span class="lbl">{{ $c->name }}<span class="cnt">{{ $c->products_count }} {{ Str::plural('item', $c->products_count) }}</span></span>
+                                        <span class="go">→</span>
+                                    </div>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -150,69 +91,86 @@
         </section>
     @endif
 
-    {{-- ============================ NEW ARRIVALS ============================ --}}
-    @if ($latest->isNotEmpty())
-        <section class="container-x pb-16 lg:pb-20 {{ $deals->isEmpty() ? 'pt-16 lg:pt-20' : '' }}">
-            <div class="reveal flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <p class="text-sm font-extrabold uppercase tracking-widest text-bug-500">Fresh in</p>
-                    <h2 class="mt-1 font-display text-3xl font-extrabold sm:text-4xl">Just landed</h2>
-                </div>
-                <a href="{{ route('new') }}" class="btn-ghost btn-sm">All new items @include('partials.icon', ['name' => 'arrow', 'class' => 'h-4 w-4'])</a>
+    {{-- ======================================================== THE EDIT --}}
+    <section class="pad" id="edit" @if ($navCategories->isNotEmpty()) style="padding-top:0" @endif>
+        <div class="wrap" data-catalog data-base="{{ route('shop') }}">
+            <div class="sh">
+                <div><small>02 — The edit</small><h2 data-split>This week’s <em data-keep>best</em> finds</h2></div>
+                <p class="sub" data-reveal><b>{{ number_format($products->total()) }}</b> bargains in stock — updated from our eBay store every day.</p>
             </div>
-            <div class="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-                @foreach ($latest as $product)
-                    <div class="reveal"><x-product-card :product="$product" /></div>
-                @endforeach
-            </div>
-        </section>
-    @else
-        <section class="container-x py-24 text-center">
-            <img src="{{ asset('images/logo-mark.svg') }}" alt="" class="mx-auto h-24 w-24 animate-wiggle">
-            <h2 class="mt-6 font-display text-3xl font-extrabold">Our bugs are busy stocking the shelves</h2>
-            <p class="mx-auto mt-3 max-w-md text-ink/60">New bargains are on their way. In the meantime, check out our eBay store.</p>
-            <a href="{{ setting('ebay_store_url') }}" class="btn-primary mt-6" target="_blank" rel="noopener">Visit our eBay store</a>
-        </section>
-    @endif
+            @include('partials.catalog', ['products' => $products, 'chips' => $chips, 'sort' => 'featured'])
+        </div>
+    </section>
 
-    {{-- ============================ HOW IT WORKS ============================ --}}
-    <section class="border-y-2 border-ink bg-cream-dark py-16 lg:py-20">
-        <div class="container-x">
-            <div class="reveal mx-auto max-w-2xl text-center">
-                <p class="text-sm font-extrabold uppercase tracking-widest text-bug-500">Easy peasy</p>
-                <h2 class="mt-1 font-display text-3xl font-extrabold sm:text-4xl">How buying works</h2>
-                <p class="mt-3 text-ink/60">Browse here, then check out on eBay. You get eBay’s protection on every order.</p>
+    {{-- ========================================================== STORY --}}
+    <section class="story">
+        <div class="wrap">
+            <div class="sticky">
+                <h2 data-split>Bought on eBay. <em data-keep>Protected</em> by eBay.</h2>
+                <p class="l" data-reveal>Everything is listed on our eBay store, so every purchase comes with secure payments, tracked delivery and the Money Back Guarantee.</p>
+                <ul class="feat">
+                    <li data-reveal><i>i.</i><div><b>Pay your way</b><span>PayPal, cards, Apple Pay &amp; Google Pay.</span></div></li>
+                    <li data-reveal><i>ii.</i><div><b>Fast UK dispatch</b><span>Packed with care, tracked to your door.</span></div></li>
+                    <li data-reveal><i>iii.</i><div><b>Money back guarantee</b><span>Item as described — or your money back.</span></div></li>
+                </ul>
+                <a class="btn btn-tang" href="{{ route('about') }}#faq" style="margin-top:34px">How buying works <span class="arr">→</span></a>
             </div>
-            <div class="mt-10 grid gap-6 md:grid-cols-3">
-                @foreach ([
-                    ['1', 'Find your bargain', 'Browse hundreds of deals here — filter by category, price and condition.', 'bg-sun'],
-                    ['2', 'Buy securely on eBay', 'Tap “Buy on eBay” and check out with PayPal, card, Apple Pay or Google Pay.', 'bg-bug-500 text-white'],
-                    ['3', 'Fast delivery', 'We pack and post quickly from the UK. Track your parcel right from eBay.', 'bg-leaf text-white'],
-                ] as [$n, $t, $d, $c])
-                    <div class="reveal card-pop p-7">
-                        <span class="grid h-12 w-12 place-items-center rounded-2xl border-2 border-ink font-display text-xl font-extrabold {{ $c }}">{{ $n }}</span>
-                        <h3 class="mt-5 text-xl font-extrabold">{{ $t }}</h3>
-                        <p class="mt-2 text-sm leading-6 text-ink/65">{{ $d }}</p>
+            <div class="cols">
+                @foreach ([[0, 1, '-0.2'], [2, 3, '0.2']] as [$a, $b, $speed])
+                    <div class="col" data-speed="{{ $speed }}">
+                        @foreach ([$a, $b] as $idx)
+                            <div class="ph">
+                                @if ($img = $storyImages->get($idx))
+                                    <img src="{{ \App\Models\Product::sized($img->images[0] ?? null, 600) }}" alt="" loading="lazy" width="400" height="530">
+                                @else
+                                    <img src="{{ asset('images/logo.png') }}" alt="" loading="lazy" style="object-fit:contain;padding:22%">
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- ============================ SOCIAL CTA ============================ --}}
-    <section class="container-x pt-16 lg:pt-20">
-        <div class="reveal grid items-center gap-8 rounded-[2rem] border-2 border-ink bg-white p-8 shadow-[7px_7px_0_0_var(--color-ink)] sm:p-12 lg:grid-cols-2">
-            <div>
-                <h2 class="font-display text-3xl font-extrabold sm:text-4xl">Follow the bugs 🐞</h2>
-                <p class="mt-3 max-w-md text-ink/65">We drop new deals, unboxings and giveaways on our socials first. Follow along and never miss a bargain.</p>
+    {{-- ========================================================== DEALS --}}
+    @if ($deals->count() >= 2)
+        <section class="pad" data-carousel-wrap>
+            <div class="wrap">
+                <div class="sh">
+                    <div><small>03 — Price drops</small><h2 data-split>Up to <em data-keep>{{ $maxDiscount }}% off</em>, while stock lasts</h2></div>
+                    <div class="arrows"><button class="round" data-prev aria-label="Previous">←</button><button class="round" data-next aria-label="Next">→</button></div>
+                </div>
+                <div class="swiper deal-swiper" data-carousel>
+                    <div class="swiper-wrapper">
+                        @foreach ($deals as $p)
+                            <div class="swiper-slide">
+                                <a class="deal" href="{{ route('product', $p) }}">
+                                    <div class="im"><img src="{{ \App\Models\Product::sized($p->images[0] ?? null, 300) ?? $p->thumb }}" alt="" loading="lazy" width="150" height="150"></div>
+                                    <div><div class="pc">-{{ $p->discount_percent }}%</div><h3>{{ $p->title }}</h3><p class="pr"><b>{{ $p->money() }}</b><s>{{ $p->money($p->original_price) }}</s></p></div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-3 lg:justify-end">
-                @forelse (socials() as $key => [$label, $url])
-                    <a href="{{ $url }}" target="_blank" rel="noopener" class="btn-ghost">@include('partials.icon', ['name' => $key, 'class' => 'h-5 w-5']) {{ $label }}</a>
-                @empty
-                    <a href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener" class="btn-ghost">@include('partials.icon', ['name' => 'bag', 'class' => 'h-5 w-5']) Follow us on eBay</a>
-                @endforelse
+        </section>
+    @endif
+
+    {{-- ======================================================== REVIEWS --}}
+    @if ($testimonials->isNotEmpty())
+        <section class="pad reviews" style="padding-top:20px">
+            <div class="wrap">
+                <div class="stars">★★★★★</div>
+                <div class="swiper rev-swiper" data-reviews>
+                    <div class="swiper-wrapper">
+                        @foreach ($testimonials as $t)
+                            <div class="swiper-slide"><blockquote>“{{ $t['text'] }}”</blockquote><p class="who"><b>{{ $t['name'] }}</b> · eBay buyer</p></div>
+                        @endforeach
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 @endsection

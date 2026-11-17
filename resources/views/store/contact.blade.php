@@ -3,60 +3,32 @@
 @section('title', 'Contact us')
 
 @section('content')
-    <section class="container-x py-14 lg:py-20">
-        <div class="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
+    <section class="page-head" style="padding-bottom:110px">
+        <div class="wrap two">
             <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-bug-500">Say hello</p>
-                <h1 class="mt-2 font-display text-5xl font-extrabold leading-tight">We’d love to hear from you</h1>
-                <p class="mt-4 max-w-md text-lg text-ink/65">Questions about an item, bulk orders or collaborations? Drop us a message and our team will get back to you.</p>
-
-                <div class="mt-8 space-y-3">
+                <nav class="crumbs"><a href="{{ route('home') }}">Home</a><span>/</span><span>Contact</span></nav>
+                <h1 data-split data-now>Say <em data-keep>hello.</em></h1>
+                <p class="sub" data-reveal>Questions about an item, bulk orders or collaborations? Drop us a message and we’ll get back to you, usually within 24 hours.</p>
+                <div style="display:grid;gap:12px;margin-top:36px" data-reveal>
                     @if (setting('contact_email'))
-                        <a href="mailto:{{ setting('contact_email') }}" class="card-pop flex items-center gap-4 p-4 transition hover:-translate-y-0.5">
-                            <span class="grid h-11 w-11 place-items-center rounded-2xl bg-sun">@include('partials.icon', ['name' => 'mail'])</span>
-                            <span><span class="block text-xs font-bold uppercase text-ink/50">Email</span><span class="font-bold">{{ setting('contact_email') }}</span></span>
-                        </a>
+                        <a class="contact-card" href="mailto:{{ setting('contact_email') }}">@include('partials.icon', ['name' => 'mail', 'class' => 'icon'])<span><small style="display:block;color:var(--color-muted);font-size:12px">Email</small><b>{{ setting('contact_email') }}</b></span></a>
                     @endif
                     @if (setting('whatsapp'))
-                        <a href="https://wa.me/{{ preg_replace('/\D/', '', setting('whatsapp')) }}" target="_blank" rel="noopener" class="card-pop flex items-center gap-4 p-4 transition hover:-translate-y-0.5">
-                            <span class="grid h-11 w-11 place-items-center rounded-2xl bg-[#25D366] text-white">@include('partials.icon', ['name' => 'whatsapp'])</span>
-                            <span><span class="block text-xs font-bold uppercase text-ink/50">WhatsApp</span><span class="font-bold">{{ setting('whatsapp') }}</span></span>
-                        </a>
+                        <a class="contact-card" href="https://wa.me/{{ preg_replace('/\D/', '', setting('whatsapp')) }}" target="_blank" rel="noopener">@include('partials.icon', ['name' => 'whatsapp', 'class' => 'icon'])<span><small style="display:block;color:var(--color-muted);font-size:12px">WhatsApp</small><b>{{ setting('whatsapp') }}</b></span></a>
                     @endif
-                    <a href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener" class="card-pop flex items-center gap-4 p-4 transition hover:-translate-y-0.5">
-                        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-bug-500 text-white">@include('partials.icon', ['name' => 'bag'])</span>
-                        <span><span class="block text-xs font-bold uppercase text-ink/50">eBay</span><span class="font-bold">Message us on eBay</span></span>
-                    </a>
+                    <a class="contact-card" href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener">@include('partials.icon', ['name' => 'bag', 'class' => 'icon'])<span><small style="display:block;color:var(--color-muted);font-size:12px">eBay</small><b>Message us on eBay</b></span></a>
                 </div>
             </div>
-
-            <div class="card-pop p-6 sm:p-10">
-                @if (session('success'))
-                    <div class="mb-6 rounded-2xl border-2 border-leaf bg-[#e6f7f0] p-4 font-semibold text-leaf">{{ session('success') }}</div>
-                @endif
-                <form action="{{ route('contact.send') }}" method="post" class="grid gap-5">
-                    @csrf
-                    <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div class="grid gap-5 sm:grid-cols-2">
-                        <label class="grid gap-2 text-sm font-bold">Your name
-                            <input name="name" value="{{ old('name') }}" required class="input" autocomplete="name">
-                            @error('name')<span class="text-bug-600">{{ $message }}</span>@enderror
-                        </label>
-                        <label class="grid gap-2 text-sm font-bold">Email
-                            <input type="email" name="email" value="{{ old('email') }}" required class="input" autocomplete="email">
-                            @error('email')<span class="text-bug-600">{{ $message }}</span>@enderror
-                        </label>
-                    </div>
-                    <label class="grid gap-2 text-sm font-bold">Subject
-                        <input name="subject" value="{{ old('subject') }}" class="input" placeholder="e.g. Question about an item">
-                    </label>
-                    <label class="grid gap-2 text-sm font-bold">Message
-                        <textarea name="message" rows="6" required class="input">{{ old('message') }}</textarea>
-                        @error('message')<span class="text-bug-600">{{ $message }}</span>@enderror
-                    </label>
-                    <button class="btn-primary justify-self-start !px-8 !py-4">Send message @include('partials.icon', ['name' => 'arrow', 'class' => 'h-4 w-4'])</button>
-                </form>
-            </div>
+            <form action="{{ route('contact.send') }}" method="post" style="display:grid;gap:16px;background:#fff;border:1px solid var(--color-line);border-radius:28px;padding:clamp(22px,4vw,40px)" data-reveal>
+                @csrf
+                @if (session('success'))<div class="alert ok">{{ session('success') }}</div>@endif
+                <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <label style="display:grid;gap:8px;font-size:14px;font-weight:500">Your name<input class="input" name="name" value="{{ old('name') }}" required autocomplete="name">@error('name')<span style="color:var(--color-tang)">{{ $message }}</span>@enderror</label>
+                <label style="display:grid;gap:8px;font-size:14px;font-weight:500">Email<input class="input" type="email" name="email" value="{{ old('email') }}" required autocomplete="email">@error('email')<span style="color:var(--color-tang)">{{ $message }}</span>@enderror</label>
+                <label style="display:grid;gap:8px;font-size:14px;font-weight:500">Subject<input class="input" name="subject" value="{{ old('subject') }}" placeholder="e.g. Question about an item"></label>
+                <label style="display:grid;gap:8px;font-size:14px;font-weight:500">Message<textarea class="input" name="message" rows="6" required>{{ old('message') }}</textarea>@error('message')<span style="color:var(--color-tang)">{{ $message }}</span>@enderror</label>
+                <button class="btn btn-dark" style="justify-self:start">Send message <span class="arr">→</span></button>
+            </form>
         </div>
     </section>
 @endsection

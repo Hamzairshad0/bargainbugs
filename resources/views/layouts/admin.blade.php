@@ -7,8 +7,8 @@
     <title>@yield('title', 'Dashboard') · {{ setting('site_name') }} Admin</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=bricolage-grotesque:600,700,800|inter:400,500,600,700,800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
 <body class="min-h-screen !bg-[#f7f3ee]">
     @php
@@ -27,7 +27,7 @@
         {{-- Sidebar --}}
         <aside id="admin-nav" class="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r-2 border-ink bg-ink text-white lg:sticky lg:top-0 lg:flex lg:h-screen">
             <div class="flex items-center justify-between px-6 py-6">
-                @include('partials.logo', ['text' => 'text-white'])
+                @include('partials.logo', ['logoText' => 'text-white', 'logoSub' => 'text-white/50'])
                 <button data-toggle="#admin-nav" class="lg:hidden" aria-label="Close menu">@include('partials.icon', ['name' => 'close'])</button>
             </div>
             <nav class="flex-1 space-y-1 px-3">

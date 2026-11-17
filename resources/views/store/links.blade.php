@@ -3,61 +3,57 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#ef3340">
+    <meta name="theme-color" content="#fbfaf7">
     <title>{{ setting('site_name') }} — Links</title>
     <meta name="description" content="{{ setting('tagline') }} Shop our latest deals, follow us and find our eBay store.">
-    <meta property="og:title" content="{{ setting('site_name') }} 🐞">
+    <meta property="og:title" content="{{ setting('site_name') }}">
     <meta property="og:description" content="{{ setting('tagline') }}">
     <meta property="og:image" content="{{ asset('images/og-default.png') }}">
     <meta property="og:url" content="{{ route('links') }}">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=bricolage-grotesque:600,700,800|inter:400,500,600,700,800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter-tight:400,500,600,700|instrument-serif:400,400i&display=swap">
+    @vite(['resources/css/app.css'])
+    <style>
+        .lk { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 62px; padding: 0 22px; border-radius: 18px; background: #fff; border: 1px solid var(--color-line); font-weight: 600; transition: transform .3s var(--ease), border-color .3s; }
+        .lk:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+        .lk.main { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+    </style>
 </head>
 {{-- "Link in bio" page — put https://bargainbugs.co.uk/links in your Instagram / TikTok bio --}}
-<body class="min-h-screen bg-bug-500">
-    <div class="dots-light pointer-events-none fixed inset-0"></div>
-    <main class="relative mx-auto flex min-h-screen max-w-md flex-col items-center px-5 py-10">
-        <img src="{{ asset('images/logo-mark.svg') }}" alt="" class="h-24 w-24 rounded-full border-4 border-ink bg-white p-2 shadow-[5px_5px_0_0_var(--color-ink)]">
-        <h1 class="mt-4 font-display text-3xl font-extrabold text-white">{{ setting('site_name') }}</h1>
-        <p class="mt-1 text-center font-semibold text-white/85">{{ setting('tagline') }}</p>
-
+<body>
+    <main style="max-width:460px;margin:0 auto;padding:44px 18px 60px;text-align:center">
+        <img src="{{ asset('images/logo.png') }}" alt="{{ setting('site_name') }}" width="110" height="110" style="margin:0 auto">
+        <h1 style="margin-top:14px;font-size:34px;font-weight:600;letter-spacing:-.04em">Bargain <em style="color:var(--color-plum)">Bugs</em></h1>
+        <p style="margin-top:4px;color:var(--color-muted)">{{ setting('tagline') }}</p>
         @if (socials())
-            <div class="mt-4 flex gap-2">
+            <div class="socials" style="justify-content:center">
                 @foreach (socials() as $key => [$label, $url])
-                    <a href="{{ $url }}" target="_blank" rel="noopener" aria-label="{{ $label }}" class="grid h-10 w-10 place-items-center rounded-full border-2 border-ink bg-white transition hover:-translate-y-0.5">@include('partials.icon', ['name' => $key, 'class' => 'h-5 w-5'])</a>
+                    <a class="round" href="{{ $url }}" target="_blank" rel="noopener" aria-label="{{ $label }}">@include('partials.icon', ['name' => $key, 'class' => 'icon icon-sm'])</a>
                 @endforeach
             </div>
         @endif
-
-        <div class="mt-7 grid w-full gap-3">
-            <a href="{{ route('home') }}" class="btn-sun w-full !py-4 !text-base">🛍️ Shop our website</a>
-            <a href="{{ route('deals') }}" class="btn-ghost w-full !py-4 !text-base">🔥 Today’s hot deals</a>
-            <a href="{{ route('new') }}" class="btn-ghost w-full !py-4 !text-base">✨ New arrivals</a>
-            <a href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener" class="btn-ghost w-full !py-4 !text-base">🏪 Our eBay store</a>
-            @if (setting('whatsapp'))
-                <a href="https://wa.me/{{ preg_replace('/\D/', '', setting('whatsapp')) }}" target="_blank" rel="noopener" class="btn-ghost w-full !py-4 !text-base">💬 WhatsApp us</a>
-            @endif
-            <a href="{{ route('contact') }}" class="btn-ghost w-full !py-4 !text-base">✉️ Contact us</a>
+        <div style="display:grid;gap:10px;margin-top:28px">
+            <a class="lk main" href="{{ route('home') }}">Shop our website <span>→</span></a>
+            <a class="lk" href="{{ route('deals') }}">Today’s price drops <span>→</span></a>
+            <a class="lk" href="{{ route('new') }}">New arrivals <span>→</span></a>
+            <a class="lk" href="{{ setting('ebay_store_url') }}" target="_blank" rel="noopener">Our eBay store <span>↗</span></a>
+            @if (setting('whatsapp'))<a class="lk" href="https://wa.me/{{ preg_replace('/\D/', '', setting('whatsapp')) }}" target="_blank" rel="noopener">WhatsApp us <span>↗</span></a>@endif
+            <a class="lk" href="{{ route('contact') }}">Contact us <span>→</span></a>
         </div>
-
         @if ($products->isNotEmpty())
-            <h2 class="mt-10 font-display text-xl font-extrabold text-white">Latest bargains</h2>
-            <div class="mt-4 grid w-full grid-cols-2 gap-3">
+            <p class="serif" style="margin-top:44px;font-size:28px">Latest bargains</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;text-align:left">
                 @foreach ($products as $p)
-                    <a href="{{ route('product', $p) }}" class="overflow-hidden rounded-2xl border-2 border-ink bg-white shadow-[4px_4px_0_0_var(--color-ink)] transition hover:-translate-y-0.5">
-                        <img src="{{ $p->image }}" alt="{{ $p->title }}" class="aspect-square w-full object-cover" loading="lazy">
-                        <div class="p-2.5">
-                            <p class="truncate text-xs font-semibold">{{ $p->title }}</p>
-                            <p class="font-display text-lg font-extrabold">{{ $p->money() }}</p>
-                        </div>
+                    <a href="{{ route('product', $p) }}" style="display:block">
+                        <img src="{{ $p->thumb }}" alt="{{ $p->title }}" loading="lazy" width="250" height="250" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;background:var(--color-stone)">
+                        <p style="margin-top:8px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $p->title }}</p>
+                        <b>{{ $p->money() }}</b>
                     </a>
                 @endforeach
             </div>
         @endif
-
-        <p class="mt-10 text-xs font-semibold text-white/70">© {{ date('Y') }} {{ setting('site_name') }}</p>
+        <p style="margin-top:44px;font-size:12px;color:var(--color-muted)">© {{ date('Y') }} {{ setting('site_name') }}</p>
     </main>
 </body>
 </html>

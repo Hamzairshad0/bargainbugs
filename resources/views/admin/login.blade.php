@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Admin login · {{ setting('site_name') }}</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link href="https://fonts.bunny.net/css?family=bricolage-grotesque:700,800|inter:400,600,700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,600,700,800&display=swap" rel="stylesheet">
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
 <body class="grid min-h-screen place-items-center !bg-bug-500 p-4">
     <div class="dots-light pointer-events-none fixed inset-0"></div>

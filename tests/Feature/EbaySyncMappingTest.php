@@ -86,6 +86,27 @@ XML;
         $this->get('/product/'.$p->slug)->assertSee('Buy now on eBay')->assertSee('og:image', false);
         $this->get('/go/'.$p->slug)->assertRedirect('https://www.ebay.co.uk/itm/123456789012');
         $this->assertSame(1, $p->fresh()->clicks);
+        $this->assertStringContainsString('s-l500', $p->thumb); // cards use the light image size
+    }
+
+    public function test_load_more_filters_and_few_queries(): void
+    {
+        foreach (range(1, 30) as $i) {
+            Product::create(['title' => "Item $i", 'price' => $i, 'original_price' => $i % 2 ? $i + 10 : null, 'quantity' => 2, 'status' => 'active', 'listed_at' => now()->subDays($i)]);
+        }
+
+        $this->get('/shop')->assertOk()->assertSee('Load 6 more');
+        $this->getJson('/shop?partial=1&page=2')->assertOk()
+            ->assertJson(['shown' => 30, 'total' => 30, 'next' => null])
+            ->assertJsonPath('html', fn ($h) => substr_count($h, 'class="card"') === 6);
+        $this->getJson('/shop?partial=1&deals=1')->assertJson(['total' => 15]);
+        $this->getJson('/shop?partial=1&sort=low')->assertJsonPath('html', fn ($h) => str_contains($h, '£1.00'));
+
+        // settings are read once per request, not once per setting() call
+        $n = 0;
+        \DB::listen(function () use (&$n) { $n++; });
+        $this->get('/about')->assertOk();
+        $this->assertLessThan(12, $n, "About page ran $n queries");
     }
 
     public function test_cron_requires_secret(): void

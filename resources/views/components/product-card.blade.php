@@ -1,44 +1,39 @@
-@props(['product', 'compact' => false])
-
-<article class="group relative flex flex-col overflow-hidden rounded-3xl border-2 border-ink bg-white transition-all duration-200 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[7px_7px_0_0_var(--color-ink)] shadow-[4px_4px_0_0_var(--color-ink)]">
-    <a href="{{ route('product', $product) }}" class="relative block aspect-square overflow-hidden bg-cream-dark">
-        <img src="{{ $product->image }}" alt="{{ $product->title }}" loading="lazy"
-             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+@props(['product', 'eager' => false])
+@php
+    $p = $product;
+    $soldOut = $p->status !== 'active' || $p->quantity < 1;
+    $alt = $p->thumb2;
+@endphp
+<article class="card">
+  <div class="media">
+    <a href="{{ route('product', $p) }}" class="im" aria-label="{{ $p->title }}">
+        <img src="{{ $p->thumb }}" alt="{{ $p->title }}" width="500" height="625" @if ($eager) fetchpriority="high" @else loading="lazy" @endif decoding="async"
              onerror="this.onerror=null;this.src='{{ asset('images/placeholder.svg') }}'">
-
-        <div class="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-            @if ($product->on_sale)
-                <span class="badge bg-bug-500 text-white border-2 border-ink">-{{ $product->discount_percent }}%</span>
-            @endif
-            @if ($product->is_new)
-                <span class="badge bg-sun text-ink border-2 border-ink">New</span>
-            @endif
-        </div>
-
-        @if ($product->status === 'active' && $product->quantity > 0 && $product->quantity <= 3)
-            <span class="absolute bottom-3 left-3 badge bg-ink text-white">🔥 Only {{ $product->quantity }} left</span>
-        @elseif ($product->status === 'sold')
-            <span class="absolute inset-0 grid place-items-center bg-ink/50"><span class="badge bg-white text-ink text-sm">Sold out</span></span>
+        @if ($alt)<img class="alt" src="{{ $alt }}" alt="" loading="lazy" decoding="async" aria-hidden="true">@endif
+        @if ($soldOut)
+            <span class="badge sold">Sold out</span>
+        @elseif ($p->on_sale)
+            <span class="badge">-{{ $p->discount_percent }}%</span>
+        @elseif ($p->is_new)
+            <span class="badge new">New</span>
+        @endif
+        @if (! $soldOut && $p->quantity > 0 && $p->quantity <= 3)
+            <span class="low">Only {{ $p->quantity }} left</span>
         @endif
     </a>
-
-    <div class="flex flex-1 flex-col gap-2 p-4">
-        @if (! $compact && $product->condition)
-            <span class="text-[11px] font-bold uppercase tracking-wider text-ink/50">{{ $product->condition }}</span>
+    <button type="button" class="heart" x-data :class="$store.wish.has({{ $p->id }}) && 'on'" @click="$store.wish.toggle({{ $p->id }})" aria-label="Save {{ $p->title }}">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.6-9 9-9 9z"/></svg>
+    </button>
+    @if (! $soldOut && $p->buy_url)
+        <a class="buy" href="{{ route('go', $p) }}" target="_blank" rel="noopener nofollow">Buy on eBay →</a>
+    @endif
+  </div>
+    <div class="info">
+        <p class="c">{{ $p->category?->name ?? $p->condition ?? 'Bargain' }}</p>
+        <h3><a href="{{ route('product', $p) }}">{{ $p->title }}</a></h3>
+        <p class="pr"><b>{{ $p->money() }}</b>@if ($p->on_sale)<s>{{ $p->money($p->original_price) }}</s>@endif</p>
+        @if ($p->quantity_sold > 0 || $p->watch_count > 2)
+            <p class="rt">@if ($p->quantity_sold > 0){{ number_format($p->quantity_sold) }} sold @endif @if ($p->watch_count > 2)· {{ $p->watch_count }} watching @endif</p>
         @endif
-        <h3 class="font-sans text-[15px] font-semibold leading-snug text-ink line-clamp-2">
-            <a href="{{ route('product', $product) }}" class="after:absolute after:inset-0 hover:text-bug-600">{{ $product->title }}</a>
-        </h3>
-        <div class="mt-auto flex items-end justify-between gap-2 pt-1">
-            <div class="flex items-baseline gap-2">
-                <span class="font-display text-xl font-extrabold text-ink">{{ $product->money() }}</span>
-                @if ($product->on_sale)
-                    <span class="text-sm font-medium text-ink/40 line-through">{{ $product->money($product->original_price) }}</span>
-                @endif
-            </div>
-            <span class="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-sun transition-transform group-hover:rotate-[-45deg]" aria-hidden="true">
-                @include('partials.icon', ['name' => 'arrow', 'class' => 'h-4 w-4'])
-            </span>
-        </div>
     </div>
 </article>

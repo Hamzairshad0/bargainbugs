@@ -4,10 +4,12 @@
 @section('hide_newsletter', '1')
 
 @section('content')
-    <section class="container-x max-w-3xl py-14">
-        <h1 class="font-display text-4xl font-extrabold">Privacy policy</h1>
-        <p class="mt-2 text-sm text-ink/50">Last updated {{ now()->format('F Y') }}</p>
-        <div class="prose-bb mt-8">
+    <section class="page-head" style="padding-bottom:110px">
+      <div class="wrap" style="max-width:860px">
+        <nav class="crumbs"><a href="{{ route('home') }}">Home</a><span>/</span><span>Privacy</span></nav>
+        <h1>Privacy <em>policy</em></h1>
+        <p class="sub">Last updated {{ now()->format('F Y') }}</p>
+        <div class="prose-bb" style="margin-top:36px;font-size:16.5px">
             <p>{{ setting('site_name') }} (“we”, “us”) runs this website to showcase products sold through our eBay store. This policy explains what information we collect and how we use it.</p>
             <h2>What we collect</h2>
             <ul>
@@ -24,5 +26,6 @@
             <h2>Contact</h2>
             <p>{{ setting('site_name') }} · {{ setting('address') }} · {{ setting('contact_email') }}</p>
         </div>
+      </div>
     </section>
 @endsection

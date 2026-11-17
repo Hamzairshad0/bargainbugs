@@ -26,6 +26,11 @@ class SettingController extends Controller
             'trust_3' => ['Trust badge 3', 'text'],
             'trust_4' => ['Trust badge 4', 'text'],
         ],
+        'Reviews & trust (shown on the home page — only real numbers please)' => [
+            'ebay_feedback_score' => ['eBay feedback score (the number next to your username, e.g. 1250)', 'text'],
+            'ebay_positive_percent' => ['eBay positive feedback % (e.g. 99.8)', 'text'],
+            'testimonials' => ['Customer reviews — one per line as: Name | Review text (copy real ones from your eBay feedback)', 'textarea'],
+        ],
         'About page' => [
             'about_title' => ['About headline', 'text'],
             'about_text' => ['About text (blank line = new paragraph)', 'textarea'],

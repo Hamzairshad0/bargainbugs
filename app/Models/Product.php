@@ -74,6 +74,39 @@ class Product extends Model
         return $this->images ?: [asset('images/placeholder.svg')];
     }
 
+    /** Card-sized image (~500px) — much lighter than the full 1600px eBay photo. */
+    public function getThumbAttribute(): string
+    {
+        return static::sized($this->images[0] ?? null, 500) ?? asset('images/placeholder.svg');
+    }
+
+    /** Second photo for the hover swap on product cards. */
+    public function getThumb2Attribute(): ?string
+    {
+        return static::sized($this->images[1] ?? null, 500);
+    }
+
+    /**
+     * Ask the image host for a specific width. Works for eBay (s-l500 / s-l960 / s-l1600)
+     * and Unsplash (?w=) URLs; anything else is returned unchanged.
+     */
+    public static function sized(?string $url, int $width): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+        if (str_contains($url, 'ebayimg.com')) {
+            $size = $width <= 300 ? 300 : ($width <= 500 ? 500 : ($width <= 960 ? 960 : 1600));
+
+            return preg_replace('#/s-l\d+\.#', '/s-l'.$size.'.', $url);
+        }
+        if (str_contains($url, 'images.unsplash.com')) {
+            return preg_replace(['#([?&])w=\d+#', '#([?&])h=\d+#'], ['${1}w='.$width, '${1}h='.$width], $url);
+        }
+
+        return $url;
+    }
+
     public function getOnSaleAttribute(): bool
     {
         return $this->original_price && (float) $this->original_price > (float) $this->price;
