@@ -16,6 +16,7 @@ class SettingController extends Controller
             'tagline' => ['Tagline', 'text'],
             'announcement' => ['Announcement bar (leave empty to hide)', 'text'],
             'meta_description' => ['SEO description (Google & social previews)', 'textarea'],
+            'google_site_verification' => ['Google Search Console code (paste the whole <meta> tag or just the content="…" code)', 'text'],
         ],
         'Home page' => [
             'hero_title' => ['Hero headline (last word gets the yellow highlight)', 'text'],

@@ -22,6 +22,8 @@
     <meta property="og:locale" content="en_GB">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="{{ $ogImage }}">
+    @php preg_match('/content=["\']([^"\']+)/', (string) setting('google_site_verification'), $gsv); $gsvCode = $gsv[1] ?? trim((string) setting('google_site_verification')); @endphp
+    @if ($gsvCode !== '')<meta name="google-site-verification" content="{{ $gsvCode }}">@endif
     @stack('meta')
 
     <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { document.documentElement.classList.add('motion'); setTimeout(function () { document.documentElement.classList.remove('motion'); }, 3000); }</script>

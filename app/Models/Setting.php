@@ -43,6 +43,7 @@ class Setting extends Model
         'ebay_feedback_score' => '',
         'ebay_positive_percent' => '',
         'testimonials' => '',
+        'google_site_verification' => '',
         'meta_description' => 'Bargain Bugs — big bargains, tiny prices. Shop our latest deals on homeware, gadgets, toys and more with secure checkout through eBay.',
     ];
 
