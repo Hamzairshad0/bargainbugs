@@ -19,7 +19,7 @@
     <meta property="product:price:amount" content="{{ $p->price }}">
     <meta property="product:price:currency" content="{{ $p->currency }}">
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org', '@type' => 'Product', 'name' => $p->title, 'image' => $gallery,
+        '@'.'context' => 'https://schema.org', '@type' => 'Product', 'name' => $p->title, 'image' => $gallery,
         'description' => $p->excerpt, 'sku' => $p->ebay_item_id ?: (string) $p->id,
         'offers' => ['@type' => 'Offer', 'price' => (string) $p->price, 'priceCurrency' => $p->currency,
             'availability' => $available ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut', 'url' => $shareUrl],
